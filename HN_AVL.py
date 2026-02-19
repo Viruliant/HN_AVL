@@ -252,16 +252,10 @@ class NestedAVL:
                 except ValueError:
                     pass
 
-            # 2. Locate the first instance of this key
+            # Locate the first instance of this key
             first_rank = current_tree.get_rank(segment)
             
-            # # 3. Logic: Find existing at position OR create new
-            # target_node = None
-            # if first_rank != -1:
-            #     # Check if the specific n-th instance exists
-            #     potential = current_tree.select(first_rank + target_index)
-            #     if potential and potential.key == segment:
-            #         target_node = potential
+            # Find existing at position OR create new
             target_node = None
             if first_rank != -1:
                 potential = current_tree.select(first_rank + target_index)
@@ -273,57 +267,15 @@ class NestedAVL:
             if not target_node:
                 target_node = current_tree.insert_at_level(segment)
 
-            # 4. If not found at that specific position, insert it
+            # If not found at that specific position, insert it
             if not target_node:
                 target_node = current_tree.insert_at_level(segment)
 
-            # 5. Descend
+            # Descend
             if not target_node.child_tree:
                 target_node.child_tree = NestedAVL()
             current_tree = target_node.child_tree
             i += 1
-
-#     def insert_path(self, path: str):
-#         """
-#         Enhanced path parser supporting [n] for ordered duplicates.
-#         Example: "bar/foo/[1]/orange"
-#         """
-#         segments = path.strip("/").split("/")
-#         current_tree = self
-#         
-#         i = 0
-#         while i < len(segments):
-#             segment = segments[i]
-#             n = 0
-#             
-#             # Look ahead for index notation [n]
-#             if i + 1 < len(segments) and segments[i+1].startswith("[") and segments[i+1].endswith("]"):
-#                 try:
-#                     n = int(segments[i+1][1:-1])
-#                     i += 1  # Consume the index segment
-#                 except ValueError:
-#                     pass # Fallback to n=0 if not an integer
-#             
-#             # Find the n-th occurrence
-#             first_idx = current_tree.get_rank(segment)
-#             target_node = None
-#             
-#             if first_idx != -1:
-#                 # Check if the n-th instance exists
-#                 potential_node = current_tree.select(first_idx + n)
-#                 if potential_node and potential_node.key == segment:
-#                     target_node = potential_node
-#             
-#             # If n-th instance doesn't exist, insert a new one
-#             if not target_node:
-#                 target_node = current_tree.insert_at_level(segment)
-#             
-#             # Move context to child tree
-#             if not target_node.child_tree:
-#                 target_node.child_tree = NestedAVL()
-#             
-#             current_tree = target_node.child_tree
-#             i += 1
 
     def print_tree(self, indent: int = 0):
         """
