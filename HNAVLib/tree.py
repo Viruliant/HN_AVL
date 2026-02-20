@@ -23,48 +23,15 @@
 # DEALINGS IN THE SOFTWARE.
 ######################################################################
 
-# HN_AVL.py
+# HNAVL.py
 
 import subprocess, threading, re, os, sys, inspect, shutil, argparse, random, math, fnmatch, json, types
 
 """
-## Operational Logic & Complexities
 
-Because this is a **Nested** structure, your operations scale based on the depth of the path () and the number of nodes at each level ().
-
-| Operation | Time Complexity | Description |
-|  |  |  |
-| **Path Insertion** |  | We perform a logarithmic insert for every step in the path. |
-| **Positional Access** |  | Accessing "Index 2 of Index 0" (e.g., `ex_tree[0][2]`). |
-| **Space Complexity** |  | Total nodes across all levels, where  is the total count of strings. |
-
-### Implementation Insight: The "Missing" Child Tree
-
-When you first insert "bar", `child_tree` should probably remain `None` to save memory. Only when the path-parser sees a slash (e.g., `"bar/foo"`) should the code instantiate a new `NestedAVL()` inside the "bar" node. This keeps your memory footprint lean if most nodes don't have children.
+# Order Statistic Hierarchical Nested AVL Tree
 
 """
-
-def main():
-
-    # ex_tree
-    # ├── bar
-    # │   ├── foo
-    # │   └── foo
-    # └── par
-
-    ex_tree = NestedAVL()
-    ex_tree.insert_path("bar")
-    ex_tree.insert_path("bar/foo")
-    ex_tree.insert_path("bar/foo")
-    ex_tree.insert_path("par")
-
-    print("Hierarchical AVL Tree Structure:")
-    ex_tree.print_tree()
-
-    print("\nlet's test adding to duplicates:")
-    ex_tree.insert_path("bar/foo/[0]/apple")
-    ex_tree.insert_path("bar/foo/[1]/orange")
-    ex_tree.print_tree()
 
 class Node:
     # The building block of the tree.
@@ -76,13 +43,13 @@ class Node:
         self.height = 1
         self.size = 1 # Augmented total of nodes in the *current* level's subtree (for  indexing).
         self.child_tree = None  # Initialized only when a child is added
-# **`child_tree`**:  A pointer to a *new* instance of `NestedAVL`, representing the nested strings (e.g., the "foos" inside "bar").
+# **`child_tree`**:  A pointer to a *new* instance of `HNAVL`, representing the nested strings (e.g., the "foos" inside "bar").
 
 ### Core AVL & Order Statistic Logic
 
 # These functions handle the balancing and indexing of a single level of the hierarchy.
 
-class NestedAVL:
+class HNAVL:
     def __init__(self):
         self.root = None
 
@@ -212,7 +179,7 @@ class NestedAVL:
 
     ## Hierarchical Path Logic
 
-    # Coordinates multiple `NestedAVL` instances.
+    # Coordinates multiple `HNAVL` instances.
 
     def get_rank(self, key: str) -> int:
         """
@@ -273,35 +240,44 @@ class NestedAVL:
 
             # Descend
             if not target_node.child_tree:
-                target_node.child_tree = NestedAVL()
+                target_node.child_tree = HNAVL()
             current_tree = target_node.child_tree
             i += 1
 
-    def print_tree(self, indent: int = 0):
-        """
-        Recursively prints the hierarchy.
-        Performs in-order traversal of the AVL tree at the current level,
-        then descends into nested child trees.
-        """
-        def _print_node(node, current_indent):
-            if not node:
-                return
-            
-            # 1. Traverse Left Subtree
-            _print_node(node.left, current_indent)
-            
-            # 2. Print Current Node Metadata
-            prefix = "  " * current_indent
-            print(f"{prefix}├── {node.key} (size={node.size}, height={node.height})")
-            
-            # 3. Traverse Nested Child Tree (if it exists and has nodes)
-            if node.child_tree and node.child_tree.root:
-                node.child_tree.print_tree(current_indent + 1)
-            
-            # 4. Traverse Right Subtree
-            _print_node(node.right, current_indent)
+    def print_tree(self, indent: int = 0, path_prefix: str = "", is_last: bool = True, parent_prefixes: str = ""):
+            """
+            Prints the hierarchy with surgical precision using ├── and └──.
+            Maintains in-order traversal and duplicate handling.
+            """
+            def _get_is_last(node, parent_is_last):
+                # A node is the 'last' in this AVL level if it has no right child
+                # AND its parent was already the last in the traversal.
+                return parent_is_last and node.right is None
 
-        _print_node(self.root, indent)
-        
-if __name__ == "__main__":
-    main()
+            def _print_node(node, current_indent, current_path, node_is_last, prefixes):
+                if not node:
+                    return
+
+                # 1. Traverse Left (Never the 'last' node of this level)
+                _print_node(node.left, current_indent, current_path, False, prefixes)
+
+                # 2. Process Current Node
+                full_path = f"{current_path}/{node.key}" if current_path else node.key
+                
+                # Determine if this specific node is the absolute end of this AVL level
+                is_really_last = node_is_last and (node.right is None)
+                marker = "└── " if is_really_last else "├── "
+                
+                print(f"{prefixes}{marker}{full_path}")
+
+                # 3. Descend into Nested Child Tree
+                if node.child_tree and node.child_tree.root:
+                    # Add a bar if we aren't at the end; add space if we are
+                    new_prefix = prefixes + ("    " if is_really_last else "│   ")
+                    node.child_tree.print_tree(current_indent + 1, full_path, True, new_prefix)
+
+                # 4. Traverse Right
+                _print_node(node.right, current_indent, current_path, node_is_last, prefixes)
+
+            _print_node(self.root, indent, path_prefix, is_last, parent_prefixes)
+
