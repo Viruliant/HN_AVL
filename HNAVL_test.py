@@ -29,22 +29,11 @@ import subprocess, threading, re, os, sys, inspect, shutil, argparse, random, ma
 
 import HNAVLib
 
+def add_comb_list():
+    # HNAdoc.insert_path("HNAVL/TreeOps/Some_op/impl_comb/[0]/space separated list of ops that can be combined to create Some_op")
+    pass
+
 def main():
-
-# Hierarchical AVL Tree Structure:
-# ├── bar
-# │   ├── bar/foo
-# │   └── bar/foo
-# └── par
-# 
-# let's test adding to duplicates:
-# ├── bar
-# │   ├── bar/foo
-# │   │   └── bar/foo/apple
-# │   └── bar/foo
-# │       └── bar/foo/orange
-# └── par
-
     ex_tree = HNAVLib.tree.HNAVL()
     ex_tree.insert_path("bar")
     ex_tree.insert_path("bar/foo")
@@ -68,6 +57,7 @@ def main():
     HNAdoc = HNAVLib.tree.HNAVL()
     HNAVLib.HNAVLdoc.populateintoHNAVL(HNAdoc)
     # HNAVLib.HNAVLdoc.populateintoHNAVL(HNAdoc) 
+    add_comb_list()
     HNAdoc.print_tree()
 
 if __name__ == "__main__":

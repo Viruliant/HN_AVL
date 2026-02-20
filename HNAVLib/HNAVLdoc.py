@@ -3,11 +3,12 @@ from . import tree
 
 def populateintoHNAVL(HNAVL):
     HNAVL.insert_path("HNAVL")
+    populateListOpsintoHNAVL(HNAVL)
+    populateTreeOpsintoHNAVL(HNAVL)
 
+def populateListOpsintoHNAVL(HNAVL):
     HNAVL.insert_path("HNAVL/ListOps")
-    HNAVL.insert_path("HNAVL/TreeOps")
 
-############################################### List of List Operations:
     HNAVL.insert_path("HNAVL/ListOps/NewList")
     ## Create an empty list or initialize a list with
     ## provided values.
@@ -72,7 +73,8 @@ def populateintoHNAVL(HNAVL):
     ## Output the values stored in each node of the list.
     ## Can be done with iterate() and print char.
 
-############################# List of Tree Operations:
+def populateTreeOpsintoHNAVL(HNAVL):
+    HNAVL.insert_path("HNAVL/TreeOps")
 
     HNAVL.insert_path("HNAVL/TreeOps/Create")
     ## Create an empty tree or initialize a tree with a
