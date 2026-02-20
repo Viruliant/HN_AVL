@@ -34,17 +34,16 @@ def main():
 # Hierarchical AVL Tree Structure:
 # ├── bar
 # │   ├── bar/foo
-# │   ├── bar/foo
-# ├── par
+# │   └── bar/foo
+# └── par
 # 
 # let's test adding to duplicates:
 # ├── bar
 # │   ├── bar/foo
-# │   │   ├── bar/foo/apple
-# │   ├── bar/foo
-# │   │   ├── bar/foo/orange
-# ├── par
-
+# │   │   └── bar/foo/apple
+# │   └── bar/foo
+# │       └── bar/foo/orange
+# └── par
 
     ex_tree = HNAVLib.tree.HNAVL()
     ex_tree.insert_path("bar")
@@ -58,13 +57,17 @@ def main():
     print("\nlet's test adding to duplicates:")
     ex_tree.insert_path("bar/foo/[0]/apple")
     ex_tree.insert_path("bar/foo/[1]/orange")
+
+    # operator error if more than 1 foo
+    # ex_tree.insert_path("bar/foo/apple") # ambiguous insertion
+
     ex_tree.print_tree()
 
     print("\nlet's see some documentation:")
 
     HNAdoc = HNAVLib.tree.HNAVL()
     HNAVLib.HNAVLdoc.populateintoHNAVL(HNAdoc)
-    # HNAVLib.HNAVLdoc.populateintoHNAVL(HNAdoc) #operator error
+    # HNAVLib.HNAVLdoc.populateintoHNAVL(HNAdoc) 
     HNAdoc.print_tree()
 
 if __name__ == "__main__":

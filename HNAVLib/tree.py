@@ -200,6 +200,24 @@ class HNAVL:
                 return rank + self._get_size(curr.left)
         return -1
 
+    def _get_upper_bound(self, key: str) -> int:
+        curr = self.root
+        rank = 0
+        while curr:
+            if key < curr.key:
+                curr = curr.left
+            else:
+                rank += self._get_size(curr.left) + 1
+                curr = curr.right
+        return rank
+
+    def count_key(self, key: str) -> int:
+        rank = self.get_rank(key)
+        if rank == -1:
+            return 0
+        upper = self._get_upper_bound(key)
+        return upper - rank
+
     def insert_path(self, path: str):
         # 1. Split path and prepare to iterate
         segments = path.strip("/").split("/")
@@ -209,32 +227,34 @@ class HNAVL:
         while i < len(segments):
             segment = segments[i]
             target_index = 0  # Default to the first occurrence
+            explicit_index = False
             
             # Check if next segment is an index like [1]
             if i + 1 < len(segments) and segments[i+1].startswith("["):
                 try:
                     # Parse the number inside [n]
                     target_index = int(segments[i+1][1:-1])
+                    explicit_index = True
                     i += 1 # Consume the index segment
                 except ValueError:
                     pass
 
             # Locate the first instance of this key
             first_rank = current_tree.get_rank(segment)
+
+            count = current_tree.count_key(segment)
+            if i < len(segments) - 1 and count > 1 and not explicit_index:
+                raise ValueError(f"Ambiguous path: multiple occurrences of '{segment}' at this level. Specify [n] to choose.")
             
             # Find existing at position OR create new
             target_node = None
             if first_rank != -1:
                 potential = current_tree.select(first_rank + target_index)
                 if potential and potential.key == segment:
-                    # Only reuse if NOT the last segment or if index was explicitly specified
-                    if i + 1 < len(segments) or (i + 1 < len(segments) and segments[i+1].startswith("[")):
+                    # Only reuse if NOT the last segment
+                    if i < len(segments) - 1:
                         target_node = potential
 
-            if not target_node:
-                target_node = current_tree.insert_at_level(segment)
-
-            # If not found at that specific position, insert it
             if not target_node:
                 target_node = current_tree.insert_at_level(segment)
 

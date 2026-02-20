@@ -42,10 +42,6 @@ def populateintoHNAVL(HNAVL):
     ## Update value at a specific position: Modify the
     ## value stored in a node. Can be done with delete
     ## and insert.
-    HNAVL.insert_path("HNAVL/ListOps/Update")
-    ## Update value at a specific position: Modify the
-    ## value stored in a node. Can be done with delete
-    ## and insert.
     HNAVL.insert_path("HNAVL/ListOps/Concat")
     ## Combine two lists into a single list.
     HNAVL.insert_path("HNAVL/ListOps/Get_Start")
