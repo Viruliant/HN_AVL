@@ -302,5 +302,6 @@ class NestedAVL:
             _print_node(node.right, current_indent)
 
         _print_node(self.root, indent)
+        
 if __name__ == "__main__":
     main()
