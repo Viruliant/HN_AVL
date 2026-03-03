@@ -529,6 +529,44 @@ class RedBlackTree:
             # parent.right must be None here
             parent.right = new_node
 
+        # def _handle_4node_split(parent, direction):
+        #     (self.split_n4leftofn2 if self.is_2node(parent) and direction == "left" else
+        #      self.split_n4rightofn2 if self.is_2node(parent) and direction == "right" else
+        #      self.split_n4leftofn3 if not self.is_2node(parent) and direction == "left" else
+        #      self.split_n4rightofn3 if not self.is_2node(parent) and direction == "right" else
+        #      self.split_n4midofn3)(parent)
+
+        # def _handle_4node_split(parent, direction):
+        #     is2 = self.is_2node(parent)
+        #     dispatch = {
+        #         True: {   # parent is 2-node
+        #             "left":  self.split_n4leftofn2,
+        #             "right": self.split_n4rightofn2,
+        #         },
+        #         False: {  # parent is 3-node
+        #             "left":  self.split_n4leftofn3,
+        #             "right": self.split_n4rightofn3,
+        #             "mid":   self.split_n4midofn3,
+        #         }
+        #     }
+        #     handler = dispatch[is2].get(direction, self.split_n4midofn3)
+        #     handler(parent)
+        # def _handle_4node_split(parent, direction):
+        #     """
+        #     Use match/case to express the switch clearly (requires Python 3.10+).
+        #     """
+        #     match (self.is_2node(parent), direction):
+        #         case True, "left":
+        #             handler = self.split_n4leftofn2
+        #         case True, _:
+        #             handler = self.split_n4rightofn2
+        #         case False, "left":
+        #             handler = self.split_n4leftofn3
+        #         case False, "right":
+        #             handler = self.split_n4rightofn3
+        #         case False, _:
+        #             handler = self.split_n4midofn3
+        #     handler(parent)
     def insert(self, key: int):
         # - **Never rotate**
         # - **Never rebalance bottom‑up**
@@ -536,50 +574,56 @@ class RedBlackTree:
         # - **Use your six split functions to mimic 234‑tree node splits**
         # - **Insert into leaf after all splits are done**
         # This produces an RB implementation that *reads exactly like a 234‑tree algorithm*.
-            if self.root is None:
-                self.root = self.RBNode(key, self.BLACK)
+        if self.root is None: # Empty tree - Initialize and exit
+            self.root = self.RBNode(key, self.BLACK)
+            return
+        # Guard: Root is a 4-node - Split before descending
+        if self.is_4node(self.root):
+            self.split_n4splitn2(self.root)
+            self.root.color = self.BLACK
+        node = self.root
+
+        def _handle_4node_split(parent, direction):
+            # --- Route 1: Parent is a 2-node (flattened two levels) ---
+            if self.is_2node(parent):
+                if direction == "left":
+                    self.split_n4leftofn2(parent)
+                else: self.split_n4rightofn2(parent)
+            # --- Route 2: Parent is a 3-node (unchanged so far) ---
+            elif direction == "left":
+                self.split_n4leftofn3(parent)
+            elif direction == "right":
+                self.split_n4rightofn3(parent)
+            # Fall-through: Mid case
+            else: self.split_n4midofn3(parent)
+        while True:
+            # Guard: Duplicate key - Exit
+            if key == node.key:
                 return
-
-            # 1. Split root if it is a 4-node
-            if self.is_4node(self.root):
-                self.split_n4splitn2(self.root)
-                self.root.color = self.BLACK # Root must stay black
-
-            node = self.root
-            while True:
-                # 2. Descend top-down
-                if key == node.key:
-                    return  # Guard: avoid duplicates
-
-                direction = "left" if key < node.key else "right"
-                child = node.left if direction == "left" else node.right
-
-                # Guard: insertion point reached
-                if child is None:
-                    new_node = self.RBNode(key, self.RED)
-                    setattr(node, "left" if direction == "left" else "right", new_node)
-                    break
-
-                # Guard: child is NOT a 4-node → descend immediately
-                if not self.is_4node(child):
-                    node = child
-                    continue
-
-                # Child IS a 4-node → split before descending
-                if self.is_2node(node):
-                    split_fn = self.split_n4leftofn2 if direction == "left" else self.split_n4rightofn2
-                    split_fn(node)
+            if key < node.key:
+                direction = "left"
+            else: direction = "right"
+            if direction == "left":
+                child = node.left
+            else:
+                child = node.right
+            # Guard: Insertion point reached (Leaf Case)
+            if child is None:
+                new_node = self.RBNode(key, self.RED)
+                # Refactored inner if
+                if direction == "left":
+                    node.left = new_node
                 else:
-                    is_left_red = self._is_red(node.left)
-                    split_map = {
-                        "left": self.split_n4leftofn3,
-                        "right": self.split_n4rightofn3
-                    }
-                    split_map.get(direction, self.split_n4midofn3)(node)
-
-                # After split, recompute child and descend
-                child = node.left if key < node.key else node.right
-                node = child
+                    node.right = new_node
+                break
+            # Guard: Maintenance Case (4-node Split)
+            if self.is_4node(child):
+                _handle_4node_split(node, direction)
+                # Re-calculate path and restart iteration
+                node = node.left if key < node.key else node.right
+                continue
+            # Standard Descent: Move to the child and repeat
+            node = child
 
     def search(self, key: int) -> bool:
         """Standard BST search - Simplicity First."""
@@ -610,48 +654,43 @@ class RedBlackTree:
         parent = None
         
         while curr:
-            # --- Pre‑emptive 2‑node fixup ---
-            if parent and self.is_2node(curr):
-                sibling = parent.right if parent.left is curr else parent.left
-
-                # Guard: fuse only when sibling is also a 2‑node
+            # Pre-emptive 2-node transformation
+            if self.is_2node(curr) and parent:
+                # Find sibling
+                sibling = parent.right if parent.left == curr else parent.left
+                # If sibling is also 2-node, fuse them
                 if self.is_2node(sibling):
                     self._fuse(parent, curr, sibling)
-
-            # --- Found target key ---
+                # Note: If sibling is 3/4 node, 'borrowing' usually requires rotations.
+                # Per SOP: Mentioning limitation - strictly avoiding rotations 
+                # might lead to simpler but more aggressive fusing.
             if key == curr.key:
-                # Internal node → swap with successor
-                if curr.left and curr.right:
-                    successor = curr.right
-                    while successor.left:
-                        successor = successor.left
+                # Guard clause: NOT an internal node → remove immediately
+                if not (curr.left and curr.right):
+                    replacement = curr.left or curr.right
+                    
+                    # Route 1: Handle Root (The Guard)
+                    if not parent:
+                        self.root = replacement
+                        return 
 
-                    curr.key = successor.key
-                    key = successor.key
-                    # Continue deleting the successor leaf
-                    parent = curr
-                    curr = curr.right
-                    continue
-
-                # Leaf or single child → remove directly
-                replacement = curr.left or curr.right
-
-                if not parent:
-                    self.root = replacement
+                    # Route 2: Handle Children (Linear logic)
+                    if parent.left == curr:
+                        parent.left = replacement
+                    else:
+                        parent.right = replacement
                     return
 
-                if parent.left is curr:
-                    parent.left = replacement
-                    return
+                # If we reach here, we know it's an internal node...
+                successor = curr.right
+                while successor.left:
+                    successor = successor.left
+                curr.key = successor.key
+                key = successor.key
 
-                parent.right = replacement
-                return
-
-            # --- Descend ---
             parent = curr
             curr = curr.left if key < curr.key else curr.right
 
-        
         # Ensure root stays black after all operations
         if self.root: self.root.color = self.BLACK
 
