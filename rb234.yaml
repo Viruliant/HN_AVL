@@ -1,0 +1,213 @@
+
+n4splitn2:
+  RBTree-before:
+    root:
+      node: { color: black, content: B }
+      left: { node: { color: red, content: A }, left: 1, right: 2 }
+      right: { node: { color: red, content: C }, left: 3, right: 4 }
+  RBTree-after:
+    root:
+      node: { color: red, content: B }
+      left: { node: { color: black, content: A }, left: 1, right: 2 }
+      right: { node: { color: black, content: C }, left: 3, right: 4 }
+  234Tree-before:
+    !4node:
+      - first: 1
+      - {!node: { content: A }}
+      - second: 2
+      - {!node: { content: B }}
+      - third: 3
+      - {!node: { content: C }}
+      - fourth: 4
+  234Tree-after:
+    !2node:
+      first: 
+        !2node: { first: 1, node: { content: A }, second: 2 }
+      node: { content: B }
+      second:
+        !2node: { first: 3, node: { content: C }, second: 4 }
+
+n4righttofn2:
+  RBTree-before:
+    root:
+      node: { color: black, content: A }
+      left: 1
+      right:
+        node: { color: black, content: C }
+        left: { node: { color: red, content: B }, left: 2, right: 3 }
+        right: { node: { color: red, content: D }, left: 4, right: 5 }
+  RBTree-after:
+    root:
+      node: { color: black, content: A }
+      left: 1
+      right:
+        node: { color: red, content: C }
+        left: { node: { color: black, content: B }, left: 2, right: 3 }
+        right: { node: { color: black, content: D }, left: 4, right: 5 }
+  234Tree-before:
+    !2node:
+      first: 1
+      node: { content: A }
+      second:
+        !4node:
+          - first: 2
+          - {!node: { content: B }}
+          - second: 3
+          - {!node: { content: C }}
+          - third: 4
+          - {!node: { content: D }}
+          - fourth: 5
+  234Tree-after:
+    !3node:
+      - first: 1
+      - {!node: { content: A }}
+      - second:
+          !2node: { first: 2, node: { content: B }, second: 3 }
+      - {!node: { content: C }}
+      - third:
+          !2node: { first: 4, node: { content: D }, second: 5 }
+
+n4leftofn2:
+  RBTree-before:
+    root:
+      node: { color: black, content: D }
+      left:
+        node: { color: black, content: B }
+        left: { node: { color: red, content: A }, left: 1, right: 2 }
+        right: { node: { color: red, content: C }, left: 3, right: 4 }
+      right: 5
+  RBTree-after:
+    root:
+      node: { color: black, content: D }
+      left:
+        node: { color: red, content: B }
+        left: { node: { color: black, content: A }, left: 1, right: 2 }
+        right: { node: { color: black, content: C }, left: 3, right: 4 }
+      right: 5
+  234Tree-before:
+    !2node:
+      first:
+        !4node:
+          - first: 1
+          - {!node: { content: A }}
+          - second: 2
+          - {!node: { content: B }}
+          - third: 3
+          - {!node: { content: C }}
+          - fourth: 4
+      node: { content: D }
+      second: 5
+  234Tree-after:
+    !3node:
+      - first:
+          !2node: { first: 1, node: { content: A }, second: 2 }
+      - {!node: { content: B }}
+      - second:
+          !2node: { first: 3, node: { content: C }, second: 4 }
+      - {!node: { content: D }}
+      - third: 5
+
+n4leftofn3:
+  RBTree-before:
+    root:
+      node: { color: black, content: D }
+      left:
+        node: { color: black, content: B }
+        left: { node: { color: red, content: A }, left: 1, right: 2 }
+        right: { node: { color: red, content: C }, left: 3, right: 4 }
+      right: { node: { color: red, content: E }, left: 5, right: 6 }
+  RBTree-after:
+    root:
+      node: { color: black, content: D }
+      left:
+        node: { color: red, content: B }
+        left: { node: { color: black, content: A }, left: 1, right: 2 }
+        right: { node: { color: black, content: C }, left: 3, right: 4 }
+      right: { node: { color: red, content: E }, left: 5, right: 6 }
+  234Tree-before:
+    !3node:
+      - first: 
+          !4node: [1, A, 2, B, 3, C, 4]
+      - {!node: { content: D }}
+      - second: 5
+      - {!node: { content: E }}
+      - third: 6
+  234Tree-after:
+    !4node:
+      - first: !2node: [1, A, 2]
+      - {!node: { content: B }}
+      - second: !2node: [3, C, 4]
+      - {!node: { content: D }}
+      - third: 5
+      - {!node: { content: E }}
+      - fourth: 6
+
+n4midofn3:
+  RBTree-before:
+    root:
+      node: { color: black, content: E }
+      left:
+        node: { color: red, content: A }
+        left: 1
+        right:
+          node: { color: black, content: C }
+          left: { node: { color: red, content: B }, left: 2, right: 3 }
+          right: { node: { color: red, content: D }, left: 4, right: 5 }
+      right: 6
+  RBTree-after:
+    root:
+      node: { color: black, content: C }
+      left: { node: { color: red, content: A }, left: 1, right: { node: { color: black, content: B }, left: 2, right: 3 }}
+      right: { node: { color: red, content: E }, left: { node: { color: black, content: D }, left: 4, right: 5 }, right: 6 }
+  234Tree-before:
+    !3node:
+      - first: 1
+      - {!node: { content: A }}
+      - second:
+          !4node: [2, B, 3, C, 4, D, 5]
+      - {!node: { content: E }}
+      - third: 6
+  234Tree-after:
+    !4node:
+      - first: 1
+      - {!node: { content: A }}
+      - second: !2node: [2, B, 3]
+      - {!node: { content: C }}
+      - third: !2node: [4, D, 5]
+      - {!node: { content: E }}
+      - fourth: 6
+
+n4rightofn3:
+  RBTree-before:
+    root:
+      node: { color: black, content: B }
+      left: { node: { color: red, content: A }, left: 1, right: 2 }
+      right:
+        node: { color: black, content: D }
+        left: { node: { color: red, content: C }, left: 3, right: 4 }
+        right: { node: { color: red, content: E }, left: 5, right: 6 }
+  RBTree-after:
+    root:
+      node: { color: black, content: B }
+      left: { node: { color: red, content: A }, left: 1, right: 2 }
+      right:
+        node: { color: red, content: D }
+        left: { node: { color: black, content: C }, left: 3, right: 4 }
+        right: { node: { color: black, content: E }, left: 5, right: 6 }
+  234Tree-before:
+    !3node:
+      - first: 1
+      - {!node: { content: A }}
+      - second: 2
+      - {!node: { content: B }}
+      - third:
+          !4node: [3, C, 4, D, 5, E, 6]
+  234Tree-after:
+    !4node:
+      - first: 1
+      - {!node: { content: A }}
+      - second: 2
+      - {!node: { content: B }}
+      - third: !2node: [3, C, 4]
+      - {!node: { content: D }}
+      - fourth: !2node: [5, E, 6]

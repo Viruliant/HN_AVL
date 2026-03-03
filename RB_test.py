@@ -131,229 +131,6 @@ root:
     left: 3
     right: 4
 ```
-----------------------------------------------------------------------
-
-The following YAML representations capture the transformation of 
-Red-Black Trees and their equivalent 2-3-4 Tree structures during 
-4-node splitting operations.
-
-6 split cases: n4splitn2 n4leftofn2 n4righttofn2 n4leftofn3 n4midofn3 n4rightofn3
-
-```yaml
-n4splitn2:
-  RBTree-before:
-    root:
-      node: { color: black, content: B }
-      left: { node: { color: red, content: A }, left: 1, right: 2 }
-      right: { node: { color: red, content: C }, left: 3, right: 4 }
-  RBTree-after:
-    root:
-      node: { color: red, content: B }
-      left: { node: { color: black, content: A }, left: 1, right: 2 }
-      right: { node: { color: black, content: C }, left: 3, right: 4 }
-  234Tree-before:
-    !4node:
-      - first: 1
-      - {!node: { content: A }}
-      - second: 2
-      - {!node: { content: B }}
-      - third: 3
-      - {!node: { content: C }}
-      - fourth: 4
-  234Tree-after:
-    !2node:
-      first: 
-        !2node: { first: 1, node: { content: A }, second: 2 }
-      node: { content: B }
-      second:
-        !2node: { first: 3, node: { content: C }, second: 4 }
-
-n4righttofn2:
-  RBTree-before:
-    root:
-      node: { color: black, content: A }
-      left: 1
-      right:
-        node: { color: black, content: C }
-        left: { node: { color: red, content: B }, left: 2, right: 3 }
-        right: { node: { color: red, content: D }, left: 4, right: 5 }
-  RBTree-after:
-    root:
-      node: { color: black, content: A }
-      left: 1
-      right:
-        node: { color: red, content: C }
-        left: { node: { color: black, content: B }, left: 2, right: 3 }
-        right: { node: { color: black, content: D }, left: 4, right: 5 }
-  234Tree-before:
-    !2node:
-      first: 1
-      node: { content: A }
-      second:
-        !4node:
-          - first: 2
-          - {!node: { content: B }}
-          - second: 3
-          - {!node: { content: C }}
-          - third: 4
-          - {!node: { content: D }}
-          - fourth: 5
-  234Tree-after:
-    !3node:
-      - first: 1
-      - {!node: { content: A }}
-      - second:
-          !2node: { first: 2, node: { content: B }, second: 3 }
-      - {!node: { content: C }}
-      - third:
-          !2node: { first: 4, node: { content: D }, second: 5 }
-
-n4leftofn2:
-  RBTree-before:
-    root:
-      node: { color: black, content: D }
-      left:
-        node: { color: black, content: B }
-        left: { node: { color: red, content: A }, left: 1, right: 2 }
-        right: { node: { color: red, content: C }, left: 3, right: 4 }
-      right: 5
-  RBTree-after:
-    root:
-      node: { color: black, content: D }
-      left:
-        node: { color: red, content: B }
-        left: { node: { color: black, content: A }, left: 1, right: 2 }
-        right: { node: { color: black, content: C }, left: 3, right: 4 }
-      right: 5
-  234Tree-before:
-    !2node:
-      first:
-        !4node:
-          - first: 1
-          - {!node: { content: A }}
-          - second: 2
-          - {!node: { content: B }}
-          - third: 3
-          - {!node: { content: C }}
-          - fourth: 4
-      node: { content: D }
-      second: 5
-  234Tree-after:
-    !3node:
-      - first:
-          !2node: { first: 1, node: { content: A }, second: 2 }
-      - {!node: { content: B }}
-      - second:
-          !2node: { first: 3, node: { content: C }, second: 4 }
-      - {!node: { content: D }}
-      - third: 5
-
-n4leftofn3:
-  RBTree-before:
-    root:
-      node: { color: black, content: D }
-      left:
-        node: { color: black, content: B }
-        left: { node: { color: red, content: A }, left: 1, right: 2 }
-        right: { node: { color: red, content: C }, left: 3, right: 4 }
-      right: { node: { color: red, content: E }, left: 5, right: 6 }
-  RBTree-after:
-    root:
-      node: { color: black, content: D }
-      left:
-        node: { color: red, content: B }
-        left: { node: { color: black, content: A }, left: 1, right: 2 }
-        right: { node: { color: black, content: C }, left: 3, right: 4 }
-      right: { node: { color: red, content: E }, left: 5, right: 6 }
-  234Tree-before:
-    !3node:
-      - first: 
-          !4node: [1, A, 2, B, 3, C, 4]
-      - {!node: { content: D }}
-      - second: 5
-      - {!node: { content: E }}
-      - third: 6
-  234Tree-after:
-    !4node:
-      - first: !2node: [1, A, 2]
-      - {!node: { content: B }}
-      - second: !2node: [3, C, 4]
-      - {!node: { content: D }}
-      - third: 5
-      - {!node: { content: E }}
-      - fourth: 6
-
-n4midofn3:
-  RBTree-before:
-    root:
-      node: { color: black, content: E }
-      left:
-        node: { color: red, content: A }
-        left: 1
-        right:
-          node: { color: black, content: C }
-          left: { node: { color: red, content: B }, left: 2, right: 3 }
-          right: { node: { color: red, content: D }, left: 4, right: 5 }
-      right: 6
-  RBTree-after:
-    root:
-      node: { color: black, content: C }
-      left: { node: { color: red, content: A }, left: 1, right: { node: { color: black, content: B }, left: 2, right: 3 }}
-      right: { node: { color: red, content: E }, left: { node: { color: black, content: D }, left: 4, right: 5 }, right: 6 }
-  234Tree-before:
-    !3node:
-      - first: 1
-      - {!node: { content: A }}
-      - second:
-          !4node: [2, B, 3, C, 4, D, 5]
-      - {!node: { content: E }}
-      - third: 6
-  234Tree-after:
-    !4node:
-      - first: 1
-      - {!node: { content: A }}
-      - second: !2node: [2, B, 3]
-      - {!node: { content: C }}
-      - third: !2node: [4, D, 5]
-      - {!node: { content: E }}
-      - fourth: 6
-
-n4rightofn3:
-  RBTree-before:
-    root:
-      node: { color: black, content: B }
-      left: { node: { color: red, content: A }, left: 1, right: 2 }
-      right:
-        node: { color: black, content: D }
-        left: { node: { color: red, content: C }, left: 3, right: 4 }
-        right: { node: { color: red, content: E }, left: 5, right: 6 }
-  RBTree-after:
-    root:
-      node: { color: black, content: B }
-      left: { node: { color: red, content: A }, left: 1, right: 2 }
-      right:
-        node: { color: red, content: D }
-        left: { node: { color: black, content: C }, left: 3, right: 4 }
-        right: { node: { color: black, content: E }, left: 5, right: 6 }
-  234Tree-before:
-    !3node:
-      - first: 1
-      - {!node: { content: A }}
-      - second: 2
-      - {!node: { content: B }}
-      - third:
-          !4node: [3, C, 4, D, 5, E, 6]
-  234Tree-after:
-    !4node:
-      - first: 1
-      - {!node: { content: A }}
-      - second: 2
-      - {!node: { content: B }}
-      - third: !2node: [3, C, 4]
-      - {!node: { content: D }}
-      - fourth: !2node: [5, E, 6]
-
-```
 
 '''
 
@@ -364,13 +141,40 @@ def load_rand(tree, n: int):
         key = random.randint(0, 1000000)
         tree.insert(key)
 
+def inorder_list(tree):
+    return list(tree.inorder_iterator())
+
+def delete_rand(tree, k):
+    """Delete k random keys from the tree using inorder indices."""
+    for _ in range(k):
+        keys = inorder_list(tree)
+        if not keys:
+            return  # tree empty
+
+        idx = random.randrange(len(keys))
+        key_to_delete = keys[idx]
+
+        print(f"Deleting key at index {idx}: {key_to_delete}")
+        tree.delete(key_to_delete)
+
+        # Optional: verify the key is gone
+        remaining = inorder_list(tree)
+        assert key_to_delete not in remaining, "Delete failed: key still present"
+
+        # Optional: verify sorted order
+        assert remaining == sorted(remaining), "Tree invariant violated"
+
 def main():
     random.seed(42) # Same random nums
     t = RedBlackTree()
     load_rand(t, 20)
-    t.print_inorder()
 
-# new version
+    print("Initial keys:", inorder_list(t))
+
+    delete_rand(t, 10)
+
+    print("After deletions:", inorder_list(t))
+
 class RedBlackTree:
     def __init__(self):
         self.root = None
@@ -520,110 +324,66 @@ class RedBlackTree:
     def insert_into_leaf(self, parent, key):
         """Insert key under a 2‑ or 3‑node parent. No rotations."""
         new_node = self.RBNode(key, self.RED)
-
         # Insert left or right based on key
-        if key < parent.key:
-            # parent.left must be None here
-            parent.left = new_node
-        else:
-            # parent.right must be None here
-            parent.right = new_node
+        if key < parent.key: parent.left = new_node # parent.left must be None here
+        else: parent.right = new_node # parent.right must be None here
 
-        # def _handle_4node_split(parent, direction):
-        #     (self.split_n4leftofn2 if self.is_2node(parent) and direction == "left" else
-        #      self.split_n4rightofn2 if self.is_2node(parent) and direction == "right" else
-        #      self.split_n4leftofn3 if not self.is_2node(parent) and direction == "left" else
-        #      self.split_n4rightofn3 if not self.is_2node(parent) and direction == "right" else
-        #      self.split_n4midofn3)(parent)
-
-        # def _handle_4node_split(parent, direction):
-        #     is2 = self.is_2node(parent)
-        #     dispatch = {
-        #         True: {   # parent is 2-node
-        #             "left":  self.split_n4leftofn2,
-        #             "right": self.split_n4rightofn2,
-        #         },
-        #         False: {  # parent is 3-node
-        #             "left":  self.split_n4leftofn3,
-        #             "right": self.split_n4rightofn3,
-        #             "mid":   self.split_n4midofn3,
-        #         }
-        #     }
-        #     handler = dispatch[is2].get(direction, self.split_n4midofn3)
-        #     handler(parent)
-        # def _handle_4node_split(parent, direction):
-        #     """
-        #     Use match/case to express the switch clearly (requires Python 3.10+).
-        #     """
-        #     match (self.is_2node(parent), direction):
-        #         case True, "left":
-        #             handler = self.split_n4leftofn2
-        #         case True, _:
-        #             handler = self.split_n4rightofn2
-        #         case False, "left":
-        #             handler = self.split_n4leftofn3
-        #         case False, "right":
-        #             handler = self.split_n4rightofn3
-        #         case False, _:
-        #             handler = self.split_n4midofn3
-        #     handler(parent)
     def insert(self, key: int):
-        # - **Never rotate**
-        # - **Never rebalance bottom‑up**
-        # - **Always split 4‑nodes before descending**
-        # - **Use your six split functions to mimic 234‑tree node splits**
-        # - **Insert into leaf after all splits are done**
-        # This produces an RB implementation that *reads exactly like a 234‑tree algorithm*.
-        if self.root is None: # Empty tree - Initialize and exit
+        if self.root is None: # tree was empty
             self.root = self.RBNode(key, self.BLACK)
             return
-        # Guard: Root is a 4-node - Split before descending
-        if self.is_4node(self.root):
+        if self.is_4node(self.root): # Split 4-node before descending
             self.split_n4splitn2(self.root)
             self.root.color = self.BLACK
-        node = self.root
+        self._insert_recursive(self.root, key) # Start recursion
 
-        def _handle_4node_split(parent, direction):
-            # --- Route 1: Parent is a 2-node (flattened two levels) ---
-            if self.is_2node(parent):
-                if direction == "left":
-                    self.split_n4leftofn2(parent)
-                else: self.split_n4rightofn2(parent)
-            # --- Route 2: Parent is a 3-node (unchanged so far) ---
-            elif direction == "left":
-                self.split_n4leftofn3(parent)
-            elif direction == "right":
-                self.split_n4rightofn3(parent)
-            # Fall-through: Mid case
-            else: self.split_n4midofn3(parent)
-        while True:
-            # Guard: Duplicate key - Exit
-            if key == node.key:
-                return
-            if key < node.key:
-                direction = "left"
-            else: direction = "right"
+    def _insert_recursive(self, node, key):
+        if key == node.key: return 
+
+        # --- RED CHECKS: Determine 3-way direction ---
+        # If a child is red, we are conceptually inside a 3-node with two keys
+        if self._is_red(node.left):
+            if key < node.left.key:    direction, child = "left",  node.left.left
+            elif key < node.key:       direction, child = "mid",   node.left.right
+            else:                      direction, child = "right", node.right
+        elif self._is_red(node.right):
+            if key < node.key:         direction, child = "left",  node.left
+            elif key < node.right.key: direction, child = "mid",   node.right.left
+            else:                      direction, child = "right", node.right.right
+        else: # Standard 2-node behavior
+            direction = "left" if key < node.key else "right"
+            child = node.left if direction == "left" else node.right
+
+        # --- Leaf Insertion ---
+        if child is None:
+            new_node = self.RBNode(key, self.RED)
             if direction == "left":
-                child = node.left
-            else:
-                child = node.right
-            # Guard: Insertion point reached (Leaf Case)
-            if child is None:
-                new_node = self.RBNode(key, self.RED)
-                # Refactored inner if
-                if direction == "left":
-                    node.left = new_node
-                else:
-                    node.right = new_node
-                break
-            # Guard: Maintenance Case (4-node Split)
-            if self.is_4node(child):
-                _handle_4node_split(node, direction)
-                # Re-calculate path and restart iteration
-                node = node.left if key < node.key else node.right
-                continue
-            # Standard Descent: Move to the child and repeat
-            node = child
+                if self._is_red(node.left): node.left.left = new_node
+                else: node.left = new_node
+            elif direction == "right":
+                if self._is_red(node.right): node.right.right = new_node
+                else: node.right = new_node
+            else: # direction == "mid"
+                if self._is_red(node.left): node.left.right = new_node
+                else: node.right.left = new_node
+            return
+
+        # --- Maintenance: 4-node Split ---
+        if not self.is_4node(child):
+            return self._insert_recursive(child, key)            
+
+        # Now "mid" is reachable when the parent (node) is a 3-node
+        if self.is_2node(node):
+            if direction == "left": self.split_n4leftofn2(node)
+            else: self.split_n4rightofn2(node)
+        elif direction == "left":
+            self.split_n4leftofn3(node)
+        elif direction == "right":
+            self.split_n4rightofn3(node)
+        else: 
+            self.split_n4midofn3(node) # REACHED!
+
+        return self._insert_recursive(node, key)
 
     def search(self, key: int) -> bool:
         """Standard BST search - Simplicity First."""
@@ -643,56 +403,83 @@ class RedBlackTree:
 
     def delete(self, key: int):
         """Top-down 2-3-4 deletion logic using color swaps, no rotations."""
-        if not self.root:
-            return
-
-        # Goal: Ensure root is not a 2-node to start
+        if not self.root: return
+        
+        # Guard: Root must be treated as red to allow descent
         if self.is_2node(self.root):
             self.root.color = self.RED
+            
+        # Handle internal key at root before recursion
+        if self.root.key == key:
+            if not (self.root.left or self.root.right):
+                self.root = None
+                return
+            else:
+                successor_key = self._get_successor_key(self.root)
+                self.root.key = successor_key
+                self._delete_recursive(self.root, successor_key)
+                if self.root: self.root.color = self.BLACK
+                return
 
-        curr = self.root
-        parent = None
-        
-        while curr:
-            # Pre-emptive 2-node transformation
-            if self.is_2node(curr) and parent:
-                # Find sibling
-                sibling = parent.right if parent.left == curr else parent.left
-                # If sibling is also 2-node, fuse them
-                if self.is_2node(sibling):
-                    self._fuse(parent, curr, sibling)
-                # Note: If sibling is 3/4 node, 'borrowing' usually requires rotations.
-                # Per SOP: Mentioning limitation - strictly avoiding rotations 
-                # might lead to simpler but more aggressive fusing.
-            if key == curr.key:
-                # Guard clause: NOT an internal node → remove immediately
-                if not (curr.left and curr.right):
-                    replacement = curr.left or curr.right
-                    
-                    # Route 1: Handle Root (The Guard)
-                    if not parent:
-                        self.root = replacement
-                        return 
-
-                    # Route 2: Handle Children (Linear logic)
-                    if parent.left == curr:
-                        parent.left = replacement
-                    else:
-                        parent.right = replacement
-                    return
-
-                # If we reach here, we know it's an internal node...
-                successor = curr.right
-                while successor.left:
-                    successor = successor.left
-                curr.key = successor.key
-                key = successor.key
-
-            parent = curr
-            curr = curr.left if key < curr.key else curr.right
-
-        # Ensure root stays black after all operations
+        self._delete_recursive(self.root, key)
         if self.root: self.root.color = self.BLACK
+
+    def _delete_recursive(self, node, key):
+        def _execute_remove_leaf(parent, direction):
+            """Surgically nullify the correct pointer."""
+            if direction == "left":
+                if self._is_red(parent.left) and parent.left.key != key: 
+                    parent.left.left = None
+                else: parent.left = None
+            elif direction == "right":
+                if self._is_red(parent.right) and parent.right.key != key: 
+                    parent.right.right = None
+                else: parent.right = None
+            elif direction == "mid":
+                if self._is_red(parent.left): parent.left.right = None
+                else: parent.right.left = None
+
+        # --- Identification Logic: Target the actual node holding the key ---
+        if self._is_red(node.left):
+            if key < node.left.key:      direction, child, sibling = "left",  node.left.left, node.left.right
+            elif key == node.left.key:   direction, child, sibling = "left",  node.left,       node.right # Target Red A
+            elif key < node.key:         direction, child, sibling = "mid",   node.left.right, node.left.left
+            else:                        direction, child, sibling = "right", node.right,      node.left
+        elif self._is_red(node.right):
+            if key < node.key:           direction, child, sibling = "left",  node.left,       node.right
+            elif key < node.right.key:   direction, child, sibling = "mid",   node.right.left, node.right.right
+            elif key == node.right.key:  direction, child, sibling = "right", node.right,      node.left # Target Red C
+            else:                        direction, child, sibling = "right", node.right.right, node.right.left
+        else:
+            direction = "left" if key < node.key else "right"
+            child = node.left if direction == "left" else node.right
+            sibling = node.right if direction == "left" else node.left
+
+        if child is None: return 
+
+        # Maintenance: Upgrade 2-node child (standard 2-3-4)
+        if self.is_2node(child) and (sibling is None or self.is_2node(sibling)):
+            self._fuse(node, child, sibling)
+            # After fusion, the structure changed; re-evaluate this level
+            return self._delete_recursive(node, key)
+
+        # --- Execution Logic ---
+        if key == child.key:
+            if not (child.left or child.right):
+                _execute_remove_leaf(node, direction)
+                return
+            else:
+                successor_key = self._get_successor_key(child)
+                child.key = successor_key
+                return self._delete_recursive(child, successor_key)
+
+        return self._delete_recursive(child, key)
+
+    def _get_successor_key(self, node):
+        """Helper to find the leftmost key in the right subtree."""
+        curr = node.right
+        while curr.left: curr = curr.left
+        return curr.key
 
     def inorder_iterator(self):
         """Yield keys in sorted (inorder) order. 234-tree style: ignore colors."""
@@ -715,6 +502,17 @@ class RedBlackTree:
             sys.stdout.write(str(k))
             first = False
         sys.stdout.write("\n")
+
+    def inorder_iterator(self):
+        stack = []
+        curr = self.root
+        while curr or stack:
+            while curr:
+                stack.append(curr)
+                curr = curr.left
+            curr = stack.pop()
+            yield curr.key
+            curr = curr.right
 
 if __name__ == "__main__":
     main()
