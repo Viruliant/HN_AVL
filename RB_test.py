@@ -548,47 +548,37 @@ class RedBlackTree:
             node = self.root
             while True:
                 # 2. Descend top-down
-                if key == node.key: return # Avoid duplicates
-                
+                if key == node.key:
+                    return  # Guard: avoid duplicates
+
                 direction = "left" if key < node.key else "right"
                 child = node.left if direction == "left" else node.right
 
-                # If we reached the insertion point
+                # Guard: insertion point reached
                 if child is None:
                     new_node = self.RBNode(key, self.RED)
-                    if direction == "left":
-                        node.left = new_node
-                    else:
-                        node.right = new_node
+                    setattr(node, "left" if direction == "left" else "right", new_node)
                     break
 
-                # 3. If child is a 4-node, split it BEFORE descending
-                if self.is_4node(child):
-                    if self.is_2node(node):
-                        if direction == "left":
-                            self.split_n4leftofn2(node)
-                        else:
-                            self.split_n4rightofn2(node)
-                    else:
-                        # Parent is a 3-node (has one red child)
-                        # Determine if 'child' is the red child's descendant (middle)
-                        is_left_red = self._is_red(node.left)
-                        
-                        if direction == "left":
-                            self.split_n4leftofn3(node)
-                        elif direction == "right":
-                            self.split_n4rightofn3(node)
-                        else:
-                            # This logic handles the logical 'middle' of a 3-node
-                            self.split_n4midofn3(node)
+                # Guard: child is NOT a 4-node → descend immediately
+                if not self.is_4node(child):
+                    node = child
+                    continue
 
-                    # After split, re-evaluate which way to go because 
-                    # the colors changed the 2-3-4 node boundaries
-                    if key < node.key:
-                        child = node.left
-                    else:
-                        child = node.right
+                # Child IS a 4-node → split before descending
+                if self.is_2node(node):
+                    split_fn = self.split_n4leftofn2 if direction == "left" else self.split_n4rightofn2
+                    split_fn(node)
+                else:
+                    is_left_red = self._is_red(node.left)
+                    split_map = {
+                        "left": self.split_n4leftofn3,
+                        "right": self.split_n4rightofn3
+                    }
+                    split_map.get(direction, self.split_n4midofn3)(node)
 
+                # After split, recompute child and descend
+                child = node.left if key < node.key else node.right
                 node = child
 
     def search(self, key: int) -> bool:
@@ -620,37 +610,47 @@ class RedBlackTree:
         parent = None
         
         while curr:
-            # Pre-emptive 2-node transformation
-            if self.is_2node(curr) and parent:
-                # Find sibling
-                sibling = parent.right if parent.left == curr else parent.left
-                # If sibling is also 2-node, fuse them
+            # --- Pre‑emptive 2‑node fixup ---
+            if parent and self.is_2node(curr):
+                sibling = parent.right if parent.left is curr else parent.left
+
+                # Guard: fuse only when sibling is also a 2‑node
                 if self.is_2node(sibling):
                     self._fuse(parent, curr, sibling)
-                # Note: If sibling is 3/4 node, 'borrowing' usually requires rotations.
-                # Per SOP: Mentioning limitation - strictly avoiding rotations 
-                # might lead to simpler but more aggressive fusing.
 
+            # --- Found target key ---
             if key == curr.key:
+                # Internal node → swap with successor
                 if curr.left and curr.right:
-                    # Internal node: Surgical key swap with successor
                     successor = curr.right
-                    while successor.left: successor = successor.left
+                    while successor.left:
+                        successor = successor.left
+
                     curr.key = successor.key
-                    key = successor.key # Continue to delete the swapped leaf
-                else:
-                    # Leaf or single child: Surgical removal
-                    replacement = curr.left or curr.right
-                    if not parent:
-                        self.root = replacement
-                    elif parent.left == curr:
-                        parent.left = replacement
-                    else:
-                        parent.right = replacement
+                    key = successor.key
+                    # Continue deleting the successor leaf
+                    parent = curr
+                    curr = curr.right
+                    continue
+
+                # Leaf or single child → remove directly
+                replacement = curr.left or curr.right
+
+                if not parent:
+                    self.root = replacement
                     return
 
+                if parent.left is curr:
+                    parent.left = replacement
+                    return
+
+                parent.right = replacement
+                return
+
+            # --- Descend ---
             parent = curr
             curr = curr.left if key < curr.key else curr.right
+
         
         # Ensure root stays black after all operations
         if self.root: self.root.color = self.BLACK
