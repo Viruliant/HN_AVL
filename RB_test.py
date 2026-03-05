@@ -165,14 +165,26 @@ def delete_rand(tree, k):
         assert remaining == sorted(remaining), "Tree invariant violated"
 
 def main():
+    '''
+    $ ./RB_test.py 
+    Initial keys: [26225, 31244, 33326, 91161, 98246, 107473, 116739, 146316, 234053, 256787, 288389, 442417, 571858, 619176, 670487, 709570, 772246, 776646, 777572, 935518]
+    Deleting key at index 6: 116739
+    Deleting key at index 7: 234053
+    Deleting key at index 16: 777572
+    Deleting key at index 0: 26225
+    Deleting key at index 6: 256787
+    Deleting key at index 11: 709570
+    Deleting key at index 10: 670487
+    Deleting key at index 11: 776646
+    Deleting key at index 8: 571858
+    Deleting key at index 6: 288389
+    After deletions: [31244, 33326, 91161, 98246, 107473, 146316, 442417, 619176, 772246, 935518]
+    '''
     random.seed(42) # Same random nums
     t = RedBlackTree()
     load_rand(t, 20)
-
     print("Initial keys:", inorder_list(t))
-
     delete_rand(t, 10)
-
     print("After deletions:", inorder_list(t))
 
 class RedBlackTree:
@@ -339,7 +351,6 @@ class RedBlackTree:
 
     def _insert_recursive(self, node, key):
         if key == node.key: return 
-
         # --- RED CHECKS: Determine 3-way direction ---
         # If a child is red, we are conceptually inside a 3-node with two keys
         if self._is_red(node.left):
@@ -438,6 +449,7 @@ class RedBlackTree:
             elif direction == "mid":
                 if self._is_red(parent.left): parent.left.right = None
                 else: parent.right.left = None
+        # ------------------------------------------------------------
 
         # --- Identification Logic: Target the actual node holding the key ---
         if self._is_red(node.left):
