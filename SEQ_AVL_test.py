@@ -27,19 +27,68 @@
 
 import subprocess, threading, re, os, sys, inspect, shutil, argparse, random, math, fnmatch, json, types
 
-def main():
-    test_int32_sequence()
-    test_uint8_sequence()
-
-INT32_MASK = 0xFFFFFFFF
-
 def int32(x: int) -> int:
-    x &= INT32_MASK
+    x &= 0xFFFFFFFF
     return x if x < 0x80000000 else x - 0x100000000
+
+def test_int32_sequence():
+    print("=== int32 sequence test ===")
+    random.seed(42)
+    t = SEQ_AVL(cast_fn=int32)
+    load_rand_seq(t, 100)
+    print(f"Sequence after load (int32 as printable chars): ")
+    t.inorder(lambda k: print(codepoint_to_char(k), end=''))
+    delete_rand_seq(t, 80)
+    print(f"Final Sequence (int32): ")
+    t.inorder(lambda k: print(codepoint_to_char(k), end=''))
+    print()
+    t.preorder(standalone_print_tree)
 
 def uint8(x: int) -> int:
     """Cast to unsigned 8-bit integer (0..255)."""
     return int(x) & 0xFF
+
+def test_uint8_sequence():
+    print("\n=== uint8 sequence test ===")
+    random.seed(123)
+    # For uint8 test, use full byte range 0..255
+    t = SEQ_AVL(cast_fn=uint8)
+    load_rand_seq(t, 50, valid_ranges=range(0, 255))
+    print(f"\nSequence after load (uint8 hex): ")
+    t.inorder(lambda k: print(f"{k & 0xFF:02X}", end=' '))
+    # Delete some random bytes
+    delete_rand_seq(t, 30)
+    print(f"Final Sequence (uint8 hex): ", end='')
+    t.inorder(lambda k: print(f"{k & 0xFF:02X}", end=' '))
+
+def main():
+    test_int32_sequence()
+    test_uint8_sequence()
+
+######################################################################
+# Final Sequence (int32): 
+# 82A703196380B366F875
+# └── '6' (sz:20)
+#     ├── 'A' (sz:8)
+#     │   ├── '2' (sz:2)
+#     │   │   └── '8' (sz:1)
+#     │   └── '0' (sz:5)
+#     │       ├── '7' (sz:1)
+#     │       └── '1' (sz:3)
+#     │           ├── '3' (sz:1)
+#     │           └── '9' (sz:1)
+#     └── '3' (sz:11)
+#         ├── '8' (sz:4)
+#         │   ├── '3' (sz:1)
+#         │   └── 'B' (sz:2)
+#         │       └── '0' (sz:1)
+#         └── '8' (sz:6)
+#             ├── '6' (sz:3)
+#             │   ├── '6' (sz:1)
+#             │   └── 'F' (sz:1)
+#             └── '5' (sz:2)
+#                 └── '7' (sz:1)
+######################################################################
 
 class SEQ_AVL:
     def __init__(self, cast_fn=None):
@@ -247,32 +296,6 @@ def delete_rand_seq(tree, k: int):
         tree.delete(idx)
         # Verification: Size should decrement
         assert tree._size(tree.root) == curr_size - 1
-
-def test_int32_sequence():
-    print("=== int32 sequence test ===")
-    random.seed(42)
-    t = SEQ_AVL(cast_fn=int32)
-    load_rand_seq(t, 100)
-    print(f"Sequence after load (int32 as printable chars): ")
-    t.inorder(lambda k: print(codepoint_to_char(k), end=''))
-    delete_rand_seq(t, 80)
-    print(f"Final Sequence (int32): ")
-    t.inorder(lambda k: print(codepoint_to_char(k), end=''))
-    print()
-    t.preorder(standalone_print_tree)
-
-def test_uint8_sequence():
-    print("\n=== uint8 sequence test ===")
-    random.seed(123)
-    # For uint8 test, use full byte range 0..255
-    t = SEQ_AVL(cast_fn=uint8)
-    load_rand_seq(t, 50, valid_ranges=range(0, 255))
-    print(f"\nSequence after load (uint8 hex): ")
-    t.inorder(lambda k: print(f"{k & 0xFF:02X}", end=' '))
-    # Delete some random bytes
-    delete_rand_seq(t, 30)
-    print(f"Final Sequence (uint8 hex): ", end='')
-    t.inorder(lambda k: print(f"{k & 0xFF:02X}", end=' '))
 
 if __name__ == "__main__":
     main()

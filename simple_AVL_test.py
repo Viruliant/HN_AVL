@@ -89,82 +89,20 @@ def int32(x: int) -> int:
     x &= INT32_MASK
     return x if x < 0x80000000 else x - 0x100000000
 
-
 class Node:
     def __init__(self, key: int):
         self.key = int32(key)
         self.left = None
         self.right = None
 
-
 class AVL:
     def __init__(self):
         self.root = None
-
-    # ---- Utility helpers ----
 
     def _height(self, n):
         if not n:
             return 0
         return 1 + max(self._height(n.left), self._height(n.right))
-
-    def _balance(self, n):
-        return self._height(n.left) - self._height(n.right)
-
-    # ---- Rotations ----
-
-    def _rotate_left(self, x: Node) -> Node:
-        y = x.right
-        x.right = y.left
-        y.left = x
-        return y
-
-    def _rotate_right(self, y: Node) -> Node:
-        x = y.left
-        y.left = x.right
-        x.right = y
-        return x
-
-    # ---- Rebalance ----
-
-    def _rebalance(self, node: Node) -> Node:
-        bf = self._balance(node)
-
-        # Left heavy
-        if bf > 1:
-            if self._balance(node.left) < 0:
-                node.left = self._rotate_left(node.left)
-            return self._rotate_right(node)
-
-        # Right heavy
-        if bf < -1:
-            if self._balance(node.right) > 0:
-                node.right = self._rotate_right(node.right)
-            return self._rotate_left(node)
-
-        return node
-
-    # ---- Insert ----
-
-    def insert(self, key: int) -> Node:
-        def _insert(node, key):
-            if not node:
-                return Node(key)
-            if key == node.key:
-                return node
-            if key < node.key:
-                node.left = _insert(node.left, key)
-            else:
-                node.right = _insert(node.right, key)
-
-            node.height = 1 + max(self._height(node.left), self._height(node.right))
-            return self._rebalance(node)
-
-        self.root = _insert(self.root, int32(key))
-        return self.root
-
-
-    # ---- Search by index ----
 
     def _size(self, n):
         if not n:
@@ -184,7 +122,44 @@ class AVL:
                 node = node.right
         return None
 
-    # ---- Delete by index ----
+    def _rebalance(self, node: Node) -> Node:
+        def _rotate_left(x: Node) -> Node:
+            y = x.right
+            x.right = y.left
+            y.left = x
+            return y
+        def _rotate_right(y: Node) -> Node:
+            x = y.left
+            y.left = x.right
+            x.right = y
+            return x
+        def _balance(n: Node) -> int:
+            return self._height(n.left) - self._height(n.right)
+        bf = _balance(node)
+        if bf > 1: # Left heavy
+            if _balance(node.left) < 0:
+                node.left = _rotate_left(node.left)
+            return _rotate_right(node)
+        if bf < -1: # Right heavy
+            if _balance(node.right) > 0:
+                node.right = _rotate_right(node.right)
+            return _rotate_left(node)
+        return node
+
+    def insert(self, key: int) -> Node:
+        def _insert(node, key):
+            if not node:
+                return Node(key)
+            if key == node.key:
+                return node
+            if key < node.key:
+                node.left = _insert(node.left, key)
+            else:
+                node.right = _insert(node.right, key)
+            node.height = 1 + max(self._height(node.left), self._height(node.right))
+            return self._rebalance(node)
+        self.root = _insert(self.root, int32(key))
+        return self.root
 
     def _min_node(self, n):
         while n.left:
